@@ -16,7 +16,7 @@ def evaluate_multitask(y_true, y_pred, w):
     w = w.reshape(w.shape[0], -1)
 
     for t in range(y_true.shape[1]):
-        mask = w[:, t]==1
+        mask = w[:, t] > 1
         if mask.sum() ==0:
             continue
 
@@ -38,5 +38,6 @@ def evaluate_multitask(y_true, y_pred, w):
         "pr_auc": float(np.mean(pr_scores)) if pr_scores else None,
         "n_valid_tasks": len(roc_scores)
     }
+
 
 
