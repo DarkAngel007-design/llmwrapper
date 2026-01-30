@@ -79,8 +79,9 @@ class DeepChemLLM(nn.Module):
         else:
             pooled = hidden.mean(dim=1)
 
-        logits  = self.classifier(pooled)
+        logits  = self.classifier(pooled.to(self.classifier.weight.dtype)
         return logits
+
 
 
 
