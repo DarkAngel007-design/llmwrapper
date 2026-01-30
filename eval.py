@@ -1,3 +1,6 @@
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 import numpy as np
 from sklearn.metrics import roc_auc_score, average_precision_score
 
@@ -32,3 +35,4 @@ def evaluate_multitask(y_true, y_pred, w):
         "pr_auc": float(np.mean(pr_scores)) if pr_scores else None,
         "n_valid_tasks": len(roc_scores)
     }
+
