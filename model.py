@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoModel
 from peft import LoraConfig, get_peft_model
+
 
 class DeepChemLLM(nn.Module):
     """
@@ -13,25 +14,25 @@ class DeepChemLLM(nn.Module):
     """
 
     def __init__(
-            self,
-            model_name: str,
-            n_tasks: int,
-            pooling: str = "cls",
-            freeze_backbone: bool = False,
-            qlora: bool = False,
+        self,
+        model_name: str,
+        n_tasks: int,
+        pooling: str = "cls",
+        freeze_backbone: bool = False,
+        qlora: bool = False,
     ):
         super().__init__()
-        
+
         self.pooling = pooling
 
         if qlora:
             self.backbone = AutoModel.from_pretrained(
                 model_name,
-                load_in_4bit = True,
+                load_in_4bit=True,
                 torch_dtype=torch.float16,
-                device_map= {"": 0},
-                )
-            
+                device_map={"":0},
+            )
+
             lora_config = LoraConfig(
                 r=16,
                 lora_alpha=32,
@@ -44,32 +45,32 @@ class DeepChemLLM(nn.Module):
             self.backbone = get_peft_model(self.backbone, lora_config)
 
         else:
-            self.backbone  = AutoModel.from_pretrained(model_name)
+            self.backbone = AutoModel.from_pretrained(model_name)
 
-        if freeze_backbone:
-            for p in self.backbone.parameters():
-                p.requires_grad = False
+            if freeze_backbone:
+                for p in self.backbone.parameters():
+                    p.requires_grad = False
 
         hidden_size = self.backbone.config.hidden_size
         self.classifier = nn.Linear(hidden_size, n_tasks)
 
-
-    def forward(self, smiles_list):
-       outputs = self.backbone(
+    def forward(self, input_ids, attention_mask):
+        """
+        input_ids: (B, L)
+        attention_mask: (B, L)
+        """
+        outputs = self.backbone(
             input_ids=input_ids,
             attention_mask=attention_mask
         )
 
         hidden = outputs.last_hidden_state
 
-        if self.pooling =="cls":
-            pooled = hidden[:,0]
+        if self.pooling == "cls":
+            pooled = hidden[:, 0]
         else:
             pooled = hidden.mean(dim=1)
 
-        logits  = self.classifier(pooled.to(self.classifier.weight.dtype))
+        pooled = pooled.to(self.classifier.weight.dtype)
+        logits = self.classifier(pooled)
         return logits
-
-
-
-
