@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from transformers import Autotokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel
 
 class DeepChemLLM(nn.Module):
     """
@@ -16,7 +16,7 @@ class DeepChemLLM(nn.Module):
     ):
         super().__init__()
 
-        self.tokenizer = Autotokenizer.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.backbone = AutoModel.from_pretrained(model_name)
 
         hidden_size = self.backbone.config.hidden_size
@@ -54,4 +54,5 @@ class DeepChemLLM(nn.Module):
             pooled = hidden.mean(dim=1)
 
         logits  = self.classifier(pooled)
+
         return logits
