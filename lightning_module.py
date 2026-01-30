@@ -44,11 +44,22 @@ class Tox21LightningModule(pl.LightningModule):
         self.validation_outputs.append(outputs)
 
     def on_validation_epoch_end(self):
+        if len(self.validation_outputs) == 0:
+            print("WARNING: No validation outputs collected!")
+            return
+        
         y_pred = np.concatenate([o["probs"] for o in self.validation_outputs], axis=0)
         y_true = np.concatenate([o["labels"] for o in self.validation_outputs], axis=0)
         w = np.concatenate([o["weights"] for o in self.validation_outputs], axis=0)
 
         metrics = evaluate_multitask(y_true, y_pred, w)
+
+        print(
+            f"\n[Epoch {self.current_epoch}] "
+            f"val_roc_auc={metrics['roc_auc']} "
+            f"val_pr_auc={metrics['pr_auc']} "
+            f"val_n_tasks={metrics['n_valid_tasks']}"
+        )
 
         if metrics["roc_auc"] is not None:
             self.log("val_roc_auc", metrics["roc_auc"], prog_bar=True, on_epoch=True)
