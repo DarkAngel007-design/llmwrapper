@@ -22,7 +22,7 @@ class DeepChemLLM(nn.Module):
     ):
         super().__init__()
 
-        self.tokenizer = Autotokenizer.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.pooling = pooling
 
         if qlora:
@@ -81,4 +81,5 @@ class DeepChemLLM(nn.Module):
 
         logits  = self.classifier(pooled)
         return logits
+
 
