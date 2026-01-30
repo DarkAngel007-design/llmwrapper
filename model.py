@@ -1,10 +1,15 @@
 import torch
 import torch.nn as nn
-from transformers import AutoTokenizer, AutoModel
+from transformers import Autotokenizer, AutoModel
+from peft import LoraConfig, get_peft_model
 
 class DeepChemLLM(nn.Module):
     """
     DeepChem-style wrapper for HuggingFace encoder models.
+    Supports:
+    - frozen backbone
+    - full finetuning
+    - QLoRA (4-bit + LoRA)
     """
 
     def __init__(
@@ -12,21 +17,42 @@ class DeepChemLLM(nn.Module):
             model_name: str,
             n_tasks: int,
             pooling: str = "cls",
-            freeze_backbone: bool = True
+            freeze_backbone: bool = False,
+            qlora: bool = False,
     ):
         super().__init__()
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.backbone = AutoModel.from_pretrained(model_name)
+        self.tokenizer = Autotokenizer.from_pretrained(model_name)
+        self.pooling = pooling
 
-        hidden_size = self.backbone.config.hidden_size
-        self.classifier = nn.Linear(hidden_size, n_tasks)
+        if qlora:
+            self.backbone = AutoModel.from_pretrained(
+                model_name,
+                load_in_4bit = True,
+                torch_dtype=torch.float16,
+                device_map= {"": 0},
+                )
+            
+            lora_config = LoraConfig(
+                r=16,
+                lora_alpha=32,
+                lora_dropout=0.05,
+                bias="none",
+                target_modules=["query", "key", "value"],
+                task_type="SEQ_CLS",
+            )
 
-        self.pooling  = pooling
+            self.backbone = get_peft_model(self.backbone, lora_config)
+
+        else:
+            self.backbone  = AutoModel.from_pretrained(model_name)
 
         if freeze_backbone:
             for p in self.backbone.parameters():
                 p.requires_grad = False
+
+        hidden_size = self.backbone.config.hidden_size
+        self.classifier = nn.Linear(hidden_size, n_tasks)
 
 
     def forward(self, smiles_list):
@@ -54,5 +80,4 @@ class DeepChemLLM(nn.Module):
             pooled = hidden.mean(dim=1)
 
         logits  = self.classifier(pooled)
-
         return logits
