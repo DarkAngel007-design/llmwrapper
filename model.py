@@ -39,7 +39,7 @@ class DeepChemLLM(nn.Module):
                 lora_dropout=0.05,
                 bias="none",
                 target_modules=["query", "key", "value"],
-                task_type="SEQ_CLS",
+                task_type="FEATURE_EXTRACTION",
             )
 
             self.backbone = get_peft_model(self.backbone, lora_config)
@@ -81,5 +81,6 @@ class DeepChemLLM(nn.Module):
 
         logits  = self.classifier(pooled)
         return logits
+
 
 
