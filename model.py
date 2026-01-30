@@ -21,8 +21,7 @@ class DeepChemLLM(nn.Module):
             qlora: bool = False,
     ):
         super().__init__()
-
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        
         self.pooling = pooling
 
         if qlora:
@@ -56,22 +55,11 @@ class DeepChemLLM(nn.Module):
 
 
     def forward(self, smiles_list):
-        """
-        smiles_list: List[str]
-        returns: logits (B, n_tasks)
-        """
+       outputs = self.backbone(
+            input_ids=input_ids,
+            attention_mask=attention_mask
+        )
 
-        device = next(self.parameters()).device
-
-
-        enc = self.tokenizer(
-            smiles_list,
-            padding = True,
-            truncation = True,
-            return_tensors="pt"
-        ).to(device)
-
-        outputs = self.backbone(**enc)
         hidden = outputs.last_hidden_state
 
         if self.pooling =="cls":
@@ -81,8 +69,6 @@ class DeepChemLLM(nn.Module):
 
         logits  = self.classifier(pooled.to(self.classifier.weight.dtype))
         return logits
-
-
 
 
 
