@@ -20,14 +20,17 @@ def evaluate_multitask(y_true, y_pred, w):
         if mask.sum() ==0:
             continue
 
+        y_t = y_true[mask, t]
+        y_p = y_pred[mask, t]
+
         if len(np.unique(y_t)) < 2:
             continue
             
         roc_scores.append(
-            roc_auc_score(y_true[mask, t], y_pred[mask, t])
+            roc_auc_score(y_t, y_p)
         )
         pr_scores.append(
-            average_precision_score(y_true[mask, t], y_pred[mask, t])
+            average_precision_score(y_t, y_p)
         )
 
     return{
@@ -35,4 +38,5 @@ def evaluate_multitask(y_true, y_pred, w):
         "pr_auc": float(np.mean(pr_scores)) if pr_scores else None,
         "n_valid_tasks": len(roc_scores)
     }
+
 
