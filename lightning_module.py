@@ -51,9 +51,9 @@ class Tox21LightningModule(pl.LightningModule):
         metrics = evaluate_multitask(y_true, y_pred, w)
 
         if metrics["roc_auc"] is not None:
-            self.log("val_roc_auc", metrics["roc_auc"], prog_bar=True)
-            self.log("val_pr_auc", metrics["pr_auc"], prog_bar=True)
-            self.log("val_n_tasks", metrics["n_valid_tasks"])
+            self.log("val_roc_auc", metrics["roc_auc"], prog_bar=True, on_epoch=True)
+            self.log("val_pr_auc", metrics["pr_auc"], prog_bar=True, on_epoch=True)
+            self.log("val_n_tasks", metrics["n_valid_tasks"], on_epoch=True)
 
         self.validation_outputs.clear()
     
