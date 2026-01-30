@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from transformers import Autotokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel
 from peft import LoraConfig, get_peft_model
 
 class DeepChemLLM(nn.Module):
@@ -81,3 +81,4 @@ class DeepChemLLM(nn.Module):
 
         logits  = self.classifier(pooled)
         return logits
+
