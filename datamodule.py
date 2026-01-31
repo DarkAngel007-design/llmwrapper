@@ -46,6 +46,7 @@ class Tox21DataModule(pl.LightningDataModule):
         batch_size=16,
         num_workers=2,
         max_length=128,
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name),
     ):
         super().__init__()
         self.tokenzier = AutoTokenizer.from_pretrained(model_name)
