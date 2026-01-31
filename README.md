@@ -40,6 +40,21 @@ Baseline validation results:
 
 ---
 
+## Environment Notes
+
+- Some environments (e.g. Kaggle, Colab) may require **NumPy < 2**
+  for compatibility with DeepChem / RDKit. If you encounter related
+  errors, try:
+
+ pip install "numpy<2"
+
+- DeepChem compatibility
+
+In certain environments, installing the pre-release version of
+DeepChem may help resolve dependency issues:
+
+ pip install --pre deepchem
+
 ## Installation
 
 Clone the repository:
