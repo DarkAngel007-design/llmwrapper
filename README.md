@@ -1,33 +1,50 @@
 # DeepChem × HuggingFace Lightning Wrapper
 
-This repo provides a clean PyTorch Lightning wrapper for running
-DeepChem-style multitask molecular benchmarks using HuggingFace
-encoder models.
+This repository provides a clean PyTorch Lightning–based wrapper for
+running **DeepChem / MoleculeNet multitask molecular benchmarks** using
+**HuggingFace encoder models** (e.g. ChemBERTa).
+
+The goal is to make it easy to:
+- experiment with modern HF encoders on MoleculeNet datasets
+- use correct DeepChem-style masking and evaluation
+- support efficient finetuning (QLoRA)
+- enable collaborative benchmarking and research
+
+---
 
 ## Features
-- HuggingFace encoder backbone (ChemBERTa)
-- Supports frozen / full finetuning / QLoRA
-- DeepChem-style masking (w > 0)
-- Multitask ROC-AUC / PR-AUC evaluation
-- Lightning DataModule separation
 
-## Tested on
-- Tox21 (12 tasks)
-  - ROC-AUC ≈ 0.72
-  - PR-AUC ≈ 0.29
+- HuggingFace encoder backbones (e.g. ChemBERTa)
+- PyTorch Lightning training loop
+- Supports:
+  - frozen backbone
+  - full finetuning
+  - QLoRA (4-bit + LoRA)
+- DeepChem-style multitask masking (`w > 0`)
+- Multitask ROC-AUC and PR-AUC evaluation
+- Scaffold split for fair comparison
+- Modular design (model / datamodule / lightning module)
 
-## Structure
-- `model.py` – encoder + task head
-- `datamodule.py` – SMILES → tokenized batches
-- `lightning_module.py` – training & validation logic
-- `eval.py` – DeepChem-style multitask metrics
+---
 
-## Next steps
-- Extend to BBBP / ClinTox
-- Integrate with DeepChem MolNet loaders
+## Tested Dataset
 
-  ## Demo Notebook
-- [Tox21 multitask classification with ChemBERTa (Lightning + QLoRA)](
-  notebooks/tox21_lightning.ipynb
-)
+### Tox21 (MoleculeNet)
+- 12 binary classification tasks
+- Scaffold split
+- Encoder: ChemBERTa
 
+Current validation results (baseline):
+- **ROC-AUC ≈ 0.72**
+- **PR-AUC ≈ 0.29**
+
+> These results serve as a reference baseline and will be extended to
+> additional MoleculeNet datasets.
+
+---
+
+## Installation
+
+```bash
+git clone https://github.com/DarkAngel007-design/llmwrapper.git
+cd llmwrapper
