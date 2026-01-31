@@ -25,3 +25,9 @@ encoder models.
 ## Next steps
 - Extend to BBBP / ClinTox
 - Integrate with DeepChem MolNet loaders
+
+  ## Demo Notebook
+- [Tox21 multitask classification with ChemBERTa (Lightning + QLoRA)](
+  notebooks/tox21_lightning.ipynb
+)
+
