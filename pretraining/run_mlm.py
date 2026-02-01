@@ -16,7 +16,11 @@ def run_mlm_pretraining(smiles_list, output_dir):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForMaskedLM.from_pretrained(model_name)
 
-    dataset = SmilesMLMDataset(smiles_list)
+    dataset = SmilesMLMDataset(
+        smiles_list=smiles_list,
+        tokenizer=tokenizer,
+        max_length=128,
+    )
     collator = get_mlm_collator(tokenizer)
 
     training_args = TrainingArguments(
