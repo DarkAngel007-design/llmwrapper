@@ -1,27 +1,65 @@
 # DeepChem × HuggingFace Lightning Wrapper
 
-This repo provides a clean PyTorch Lightning wrapper for running
-DeepChem-style multitask molecular benchmarks using HuggingFace
-encoder models.
+This repository provides a clean PyTorch Lightning wrapper for running
+**DeepChem / MoleculeNet molecular benchmarks** using
+**HuggingFace encoder models** (e.g. ChemBERTa).
+
+The goal is to make it easy for others to:
+- experiment with modern HF encoders on MoleculeNet datasets
+- use correct DeepChem-style multitask masking and evaluation
+- run efficient finetuning (QLoRA)
+- collaborate on benchmarking and research
+
+---
 
 ## Features
-- HuggingFace encoder backbone (ChemBERTa)
-- Supports frozen / full finetuning / QLoRA
-- DeepChem-style masking (w > 0)
-- Multitask ROC-AUC / PR-AUC evaluation
-- Lightning DataModule separation
 
-## Tested on
-- Tox21 (12 tasks)
-  - ROC-AUC ≈ 0.72
-  - PR-AUC ≈ 0.29
+- HuggingFace encoder backbones (ChemBERTa)
+- PyTorch Lightning training pipeline
+- Supports:
+  - frozen backbone
+  - full finetuning
+  - QLoRA (4-bit + LoRA)
+- DeepChem-style multitask masking (`w > 0`)
+- Multitask ROC-AUC and PR-AUC evaluation
+- Scaffold split for fair comparison
+- Modular design (model / datamodule / lightning module)
 
-## Structure
-- `model.py` – encoder + task head
-- `datamodule.py` – SMILES → tokenized batches
-- `lightning_module.py` – training & validation logic
-- `eval.py` – DeepChem-style multitask metrics
+---
 
-## Next steps
-- Extend to BBBP / ClinTox
-- Integrate with DeepChem MolNet loaders
+## Tested Dataset
+
+### Tox21 (MoleculeNet)
+- 12 binary classification tasks
+- Scaffold split
+- Encoder: ChemBERTa
+
+Baseline validation results:
+- **ROC-AUC ≈ 0.72**
+- **PR-AUC ≈ 0.29**
+
+---
+
+## Environment Notes
+
+- Some environments (e.g. Kaggle, Colab) may require **NumPy < 2**
+  for compatibility with DeepChem / RDKit. If you encounter related
+  errors, try:
+
+ pip install "numpy<2"
+
+- DeepChem compatibility
+
+In certain environments, installing the pre-release version of
+DeepChem may help resolve dependency issues:
+
+ pip install --pre deepchem
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/DarkAngel007-design/llmwrapper.git
+cd llmwrapper
+pip install -r requirements.txt

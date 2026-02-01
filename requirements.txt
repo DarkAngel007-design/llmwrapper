@@ -1,0 +1,11 @@
+```txt
+torch
+pytorch-lightning
+transformers
+peft
+accelerate
+bitsandbytes
+deepchem
+rdkit
+scikit-learn
+numpy
